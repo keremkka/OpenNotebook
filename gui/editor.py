@@ -1,4 +1,5 @@
 import customtkinter as ctk
+import uuid
 from backend.storage import load_notes, save_notes
 
 
@@ -39,7 +40,15 @@ class Editor(ctk.CTkFrame):
             return
         
         notes = load_notes()
-        notes[title] = content
+        note_id = str(uuid.uuid4())
+        notes[note_id] = {
+            "title": title,
+            "content": content
+        }
+
         save_notes(notes)
 
         print("SAVED")
+
+        self.master.sidebar.refresh_notes()
+
