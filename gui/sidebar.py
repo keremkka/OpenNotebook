@@ -39,7 +39,7 @@ class Sidebar(ctk.CTkFrame):
 
     def new_note(self):
         self.master.editor.clear()
-
+        self.master.editor.current_note_id = None
 
 
     def refresh_notes(self):
@@ -72,5 +72,10 @@ class Sidebar(ctk.CTkFrame):
 
         self.master.editor.title.insert(0, note["title"])
         self.master.editor.textbox.insert("1.0", note["content"])
+
+        self.master.editor.current_note_id = note_id
+
+
+
 
 
