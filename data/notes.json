@@ -1,14 +1,50 @@
 {
-    "10aa6ca3-3e31-4210-9367-8fdf7a0c1fc4": {
-        "title": "V1.01",
-        "content": "Create/Update is done. And now, updated...\n\nits look ok rn."
+    "456c4ccf-6b27-4353-878b-41fb57c38e4f": {
+        "id": "456c4ccf-6b27-4353-878b-41fb57c38e4f",
+        "title": "full json",
+        "content": "hmm 4",
+        "created_at": "2026-02-17T22:04:11.268481",
+        "updated_at": "2026-02-17T22:17:14.732781",
+        "is_synced": false
     },
-    "4758307e-cd7d-46f9-9f81-12fdcab9a607": {
+    "7d15e3b9-a90d-4c78-8012-77aceaa663b6": {
+        "id": "7d15e3b9-a90d-4c78-8012-77aceaa663b6",
         "title": "Note - 1",
-        "content": "111"
+        "content": "dadadasdad 1 last hmm",
+        "created_at": "2026-02-17T22:07:16.223786",
+        "updated_at": "2026-02-17T22:27:43.154041",
+        "is_synced": false
     },
-    "a0bb78c4-13be-47e9-a037-d531645e8c22": {
+    "2157d765-025d-4e3d-ab48-7f68891a0c1e": {
+        "id": "2157d765-025d-4e3d-ab48-7f68891a0c1e",
         "title": "Note - 2",
-        "content": "1231"
+        "content": "asdasd 2  31",
+        "created_at": "2026-02-17T22:07:19.263123",
+        "updated_at": "2026-02-17T22:45:59.812190",
+        "is_synced": false
+    },
+    "8ac3f5cc-6912-441d-ac61-44b44b7b5efc": {
+        "id": "8ac3f5cc-6912-441d-ac61-44b44b7b5efc",
+        "title": "Note - 3",
+        "content": "asdadsasdsad 331313",
+        "created_at": "2026-02-17T22:07:21.050489",
+        "updated_at": "2026-02-17T22:27:50.393107",
+        "is_synced": false
+    },
+    "56950bcc-cbfd-4042-ab37-32cd602a0ba9": {
+        "id": "56950bcc-cbfd-4042-ab37-32cd602a0ba9",
+        "title": "Note - 4",
+        "content": "",
+        "created_at": "2026-02-17T22:17:25.243032",
+        "updated_at": "2026-02-17T22:17:25.243032",
+        "is_synced": false
+    },
+    "1edfec77-a95f-4c77-b004-fdd2a48e0246": {
+        "id": "1edfec77-a95f-4c77-b004-fdd2a48e0246",
+        "title": "DAKKA",
+        "content": "1",
+        "created_at": "2026-02-17T22:45:29.080312",
+        "updated_at": "2026-02-17T22:45:29.080312",
+        "is_synced": false
     }
 }

@@ -2,7 +2,6 @@ import customtkinter as ctk
 from backend.storage import load_notes
 
 
-
 class Sidebar(ctk.CTkFrame):
     def __init__(self, master):
         super().__init__(master)
@@ -12,7 +11,7 @@ class Sidebar(ctk.CTkFrame):
 
 
         #title
-        self.title = ctk.CTkLabel(self, text="MENU", font=("Arial", 18, "bold"))
+        self.title = ctk.CTkLabel(self, text="ONB - MENU", font=("Arial", 18, "bold"))
         self.title.pack(pady=(20,10))
 
         #buttons
@@ -48,7 +47,14 @@ class Sidebar(ctk.CTkFrame):
 
         notes = load_notes()
 
-        for note_id, data in notes.items():
+        sorted_notes = sorted(
+            notes.items(),
+            key=lambda item: item[1].get("updated_at", ""),
+            reverse=True 
+        )
+
+
+        for note_id, data in sorted_notes:
             title = data["title"]
 
             btn = ctk.CTkButton(
@@ -75,6 +81,16 @@ class Sidebar(ctk.CTkFrame):
 
         self.master.editor.current_note_id = note_id
 
+        updated = note.get("updated_at")
+
+        if updated:
+
+            relative = self.master.editor.format_relative_time(updated)
+            self.master.editor.modified_label.configure(text=f"Last modified: {relative}")
+
+
+        else:
+            self.master.editor.modified_label.configure(text="")
 
 
 

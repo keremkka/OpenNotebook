@@ -1,4 +1,5 @@
 import customtkinter as ctk
+from datetime import datetime
 import uuid
 from backend.storage import load_notes, save_notes
 
@@ -14,13 +15,13 @@ class Editor(ctk.CTkFrame):
         self.title = ctk.CTkEntry(self, fg_color="#052424", font=("Consolas", 14), height=30)
         self.title.pack(fill="x", expand=False, padx=20, pady=(20,0))
 
-        #status label
-        self.status_label = ctk.CTkLabel(self, text="", font=("Arial", 12), fg_color="#052424")
-        self.status_label.pack(pady=(5, 0))
+        #modified label
+        self.modified_label = ctk.CTkLabel(self, text="", font=("Arial", 11), text_color="gray")
+        self.modified_label.pack(pady=(2,5))
         
         #textbox
         self.textbox = ctk.CTkTextbox(self, fg_color="#052424" ,font=("Consolas", 14))
-        self.textbox.pack(fill="both", expand=True, padx=20, pady=(10,20))
+        self.textbox.pack(fill="both", expand=True, padx=20, pady=(5,20))
 
         #save button
         self.save_button = ctk.CTkButton(self, text="Save", fg_color="#264242", command=self.save_note)
@@ -30,7 +31,9 @@ class Editor(ctk.CTkFrame):
         self.delete_button = ctk.CTkButton(self, text="Delete", fg_color="#264242", command=self.delete_note)
         self.delete_button.pack(pady=(0,20))
 
-
+        #status label
+        self.status_label = ctk.CTkLabel(self, text="", font=("Arial", 12), fg_color="#052424")
+        self.status_label.pack(pady=(0, 0))
 
 
 
@@ -42,6 +45,8 @@ class Editor(ctk.CTkFrame):
     def clear(self):
         self.textbox.delete("1.0","end")
         self.title.delete("0", "end")
+        self.modified_label.configure(text="")
+
 
     
 
@@ -65,8 +70,6 @@ class Editor(ctk.CTkFrame):
         #print(numbers)
 
 
-    
-
 
         if title == "":
 
@@ -83,25 +86,39 @@ class Editor(ctk.CTkFrame):
         if self.current_note_id is None:
             #creat uuid
             note_id = str(uuid.uuid4())
+            now = datetime.now().isoformat()
+
             notes[note_id] = {
+                "id": note_id,
                 "title": title,
-                "content": content
+                "content": content,
+                "created_at": now,
+                "updated_at": now,
+                "is_synced": False
             }
             self.current_note_id = note_id
 
+
         else:
             #update the uuid
-            notes[self.current_note_id] = {
-                "title": title,
-                "content": content
-            }
+            note = notes[self.current_note_id]
+
+            note["title"] = title
+            note["content"] = content
+            note["updated_at"] = datetime.now().isoformat()
+
+            notes[self.current_note_id] = note
 
         save_notes(notes)
 
+        updated = notes[self.current_note_id]["updated_at"]
+        relative = self.format_relative_time(updated)
+        self.modified_label.configure(text=f"Last modified: {relative}")
+
+                        
         self.show_status("Saved ✔")
 
         self.master.sidebar.refresh_notes()
-
 
 
 
@@ -113,11 +130,6 @@ class Editor(ctk.CTkFrame):
 
             return
         
-        if self.current_note_id is None:
-            self.show_status("No Note Selected")
-
-            return
-
         notes = load_notes()
 
         if self.current_note_id in notes:
@@ -134,3 +146,51 @@ class Editor(ctk.CTkFrame):
     def show_status(self, message):
         self.status_label.configure(text=message)
         self.status_label.after(2000, lambda: self.status_label.configure(text=""))
+
+
+
+    def format_relative_time(self, iso_string):
+        from datetime import datetime
+
+        updated_time = datetime.fromisoformat(iso_string)
+        now = datetime.now()
+
+        delta = now - updated_time
+
+        seconds = int(delta.total_seconds())
+        minutes = seconds // 60
+        hours = minutes // 60
+        days = delta.days
+
+        if seconds < 60:
+            return "Just now"
+
+        elif minutes < 60:
+            return f"{minutes} minute{'s' if minutes > 1 else ''} ago"
+
+        elif hours < 24:
+            return f"{hours} hour{'s' if hours > 1 else ''} ago"
+
+        elif days == 1:
+            return "Yesterday"
+
+        elif days < 7:
+            return f"{days} days ago"
+
+        elif days < 30:
+            weeks = days // 7
+            return f"{weeks} week{'s' if weeks > 1 else ''} ago"
+
+        elif days < 365:
+            months = days // 30
+            return f"{months} month{'s' if months > 1 else ''} ago"
+
+        else:
+            years = days // 365
+            return f"{years} year{'s' if years > 1 else ''} ago"
+
+
+
+
+
+

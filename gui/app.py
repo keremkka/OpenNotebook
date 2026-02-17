@@ -10,7 +10,7 @@ class App(ctk.CTk):
         super().__init__()
 
         #window settings:
-        self.title("OBN")
+        self.title("ONB")
         self.geometry("900x600")
 
         self.sidebar = Sidebar(self)
