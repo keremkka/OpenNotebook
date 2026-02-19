@@ -1,12 +1,16 @@
 import customtkinter as ctk
 from datetime import datetime
 import uuid
-from backend.storage import load_notes, save_notes
+from core.note_service import NoteService
 
 
 class Editor(ctk.CTkFrame):
-    def __init__(self, master):
+    def __init__(self, master, note_service):
         super().__init__(master)
+
+        self.note_service = note_service
+
+        self.note_service = NoteService()
 
         self.configure(fg_color="#113232")
         self.pack(side="left", fill="both", expand=True)
@@ -54,71 +58,25 @@ class Editor(ctk.CTkFrame):
         title = self.title.get().strip()
         content = self.textbox.get("1.0", "end").strip()
 
-        notes = load_notes()
-        titles = [note["title"] for note in notes.values()]
-        #print(titles)
+        note_id = self.note_service.save_note(
+            title,
+            content,
+            self.current_note_id
+        )
 
-        numbers = []
-        for t in titles:
-            if t.startswith("Note - "):
-                try:
-                    num = int(t.split("Note - ")[1])
-                    numbers.append(num)
+        self.current_note_id = note_id
 
-                except:
-                    pass
-        #print(numbers)
+        self.master.refresh_sidebar()
 
-
-
-        if title == "":
-
-            if numbers:
-                next_number = max(numbers) + 1
-            else:
-                next_number = 1 
-
-            #print("next: ", next_number)
-            title = f"Note - {next_number}"
-            self.title.insert(0, title)
-
-        
-        if self.current_note_id is None:
-            #creat uuid
-            note_id = str(uuid.uuid4())
-            now = datetime.now().isoformat()
-
-            notes[note_id] = {
-                "id": note_id,
-                "title": title,
-                "content": content,
-                "created_at": now,
-                "updated_at": now,
-                "is_synced": False
-            }
-            self.current_note_id = note_id
-
-
-        else:
-            #update the uuid
-            note = notes[self.current_note_id]
-
-            note["title"] = title
-            note["content"] = content
-            note["updated_at"] = datetime.now().isoformat()
-
-            notes[self.current_note_id] = note
-
-        save_notes(notes)
-
-        updated = notes[self.current_note_id]["updated_at"]
-        relative = self.format_relative_time(updated)
-        self.modified_label.configure(text=f"Last modified: {relative}")
-
-                        
-        self.show_status("Saved ✔")
+        # title input'u core'un ürettiği title ile güncelle
+        notes = self.note_service.load()
+        saved_note = notes[self.current_note_id]
+        self.title.delete(0, "end")
+        self.title.insert(0, saved_note["title"])
 
         self.master.sidebar.refresh_notes()
+        self.show_status("Saved ✔")
+
 
 
 
@@ -127,14 +85,9 @@ class Editor(ctk.CTkFrame):
         if self.current_note_id is None:
             self.clear()
             self.show_status("Page Cleared")
-
             return
-        
-        notes = load_notes()
 
-        if self.current_note_id in notes:
-            del notes[self.current_note_id]
-            save_notes(notes)
+        self.note_service.delete(self.current_note_id)
 
         self.current_note_id = None
         self.clear()
@@ -143,14 +96,16 @@ class Editor(ctk.CTkFrame):
         self.show_status("Deleted 🗑")
 
 
+
+
+
     def show_status(self, message):
         self.status_label.configure(text=message)
         self.status_label.after(2000, lambda: self.status_label.configure(text=""))
 
 
 
-    def format_relative_time(self, iso_string):
-        from datetime import datetime
+    def get_relative_time(self, iso_string):
 
         updated_time = datetime.fromisoformat(iso_string)
         now = datetime.now()

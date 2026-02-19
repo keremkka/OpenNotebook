@@ -1,10 +1,11 @@
 import customtkinter as ctk
-from backend.storage import load_notes
 
 
 class Sidebar(ctk.CTkFrame):
-    def __init__(self, master):
+    def __init__(self, master, note_service):
         super().__init__(master)
+
+        self.note_service = note_service
 
         self.configure(width=200, fg_color="#264242")
         self.pack(side="left", fill="y")
@@ -45,53 +46,42 @@ class Sidebar(ctk.CTkFrame):
         for widget in self.notes_frame.winfo_children():
             widget.destroy()
 
-        notes = load_notes()
+        notes = self.note_service.get_all_notes()
 
-        sorted_notes = sorted(
-            notes.items(),
-            key=lambda item: item[1].get("updated_at", ""),
-            reverse=True 
-        )
-
-
-        for note_id, data in sorted_notes:
-            title = data["title"]
-
+        for note in notes:
             btn = ctk.CTkButton(
                 self.notes_frame,
-                text=title,
+                text=note["title"],
                 fg_color="#052424",
-                command=lambda i=note_id: self.open_note(i)
+                command=lambda i=note["id"]: self.open_note(i)
             )
 
             btn.pack(fill="x", pady=5)
 
 
 
-
     def open_note(self, note_id):
-        notes = load_notes()
-        note = notes[note_id]
 
-        self.master.editor.title.delete(0, "end")
-        self.master.editor.textbox.delete("1.0", "end")
+        note = self.note_service.get_note(note_id)
 
-        self.master.editor.title.insert(0, note["title"])
-        self.master.editor.textbox.insert("1.0", note["content"])
+        if not note:
+            return
 
-        self.master.editor.current_note_id = note_id
+        editor = self.master.editor
+
+        editor.title.delete(0, "end")
+        editor.textbox.delete("1.0", "end")
+
+        editor.title.insert(0, note["title"])
+        editor.textbox.insert("1.0", note["content"])
+
+        editor.current_note_id = note_id
 
         updated = note.get("updated_at")
 
         if updated:
-
-            relative = self.master.editor.format_relative_time(updated)
-            self.master.editor.modified_label.configure(text=f"Last modified: {relative}")
-
-
+            relative = self.note_service.get_relative_time(updated)
+            editor.modified_label.configure(text=f"Last modified: {relative}")
         else:
-            self.master.editor.modified_label.configure(text="")
-
-
-
+            editor.modified_label.configure(text="")
 

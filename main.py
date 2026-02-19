@@ -1,5 +1,7 @@
-from gui.app import App
+from presentation.app import App
+from core.note_service import NoteService
 
 if __name__ == "__main__":
-    app = App()
+    note_service = NoteService()
+    app = App(note_service)
     app.mainloop()
